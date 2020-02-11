@@ -2,11 +2,21 @@
 import React from "react";
 import Styles from "./Styles";
 import { Form, Field } from "react-final-form";
+import { alpha, hyphen, InputField, Radio, space, ToolTip } from "dfs-ui-components";
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+const InputFieldAdapter = ({ input, meta, ...rest }) => (
+  <InputField
+    {...input}
+    {...rest}
+    
+    onChangeCallback={(event, formSection) => input.onChange(event.target.value)}
+    errorMessages={meta.error && meta.touched && wasSubmitted ? [meta.error] : []}
+  />
+)
+var wasSubmitted = false;
 const App = () => {
-  let wasSubmitted = false;
   const onSubmit = async values => {
     await sleep(300);
     window.alert(JSON.stringify(values, 0, 2));
@@ -43,8 +53,7 @@ const App = () => {
           firstName: "Alexis",
           favoriteColor: "#ff0000",
           toppings: ["ham", "chicken"],
-          sauces: ["ketchup", "mustard"],
-          stooge: "larry"
+          sauces: ["ketchup", "mustard"]
         }}
         render={({ handleSubmit, form, submitting, pristine, values }) => (
           <form onSubmit={(event, hs) => myHandleSubmit(event, handleSubmit)}>
@@ -52,26 +61,27 @@ const App = () => {
               <label>First Name</label>
               <Field name="firstName">
                 {({ input, meta }) => (
-                  <div>
-                    <input {...input} type="text" placeholder="First Name" />
-                    {meta.error && meta.touched && wasSubmitted && (
-                      <span>{meta.error}</span>
-                    )}
-                  </div>
+                  <InputField
+                  {...input}
+                  showLabel={false}
+                  maxLength={10}
+                  allowedRules={[{ rule: alpha }, { rule: hyphen }, { rule: space }]}
+                  onChangeCallback={(event, formSection) => input.onChange(event.target.value)}
+                  errorMessages={meta.error && meta.touched && wasSubmitted ? [meta.error] : []}
+                />
                 )}
               </Field>
             </div>
             <div>
               <label>Last Name</label>
-              <Field name="lastName">
-                {({ input, meta }) => (
-                  <div>
-                    <input {...input} type="text" placeholder="Last Name" />
-                    {meta.error && meta.touched && wasSubmitted && (
-                      <span>{meta.error}</span>
-                    )}
-                  </div>
-                )}
+              <Field id="lastName" name="lastName"
+                component={InputFieldAdapter} 
+                hintText="Last Name"
+                floatingLabelText="Last Name" 
+                showLabel={false}
+                maxLength={10}
+                allowedRules={[{ rule: alpha }, { rule: hyphen }, { rule: space }]}
+                >
               </Field>
             </div>
             <div>
